@@ -1,5 +1,6 @@
 var path = require('path')
 var webpack = require('webpack')
+// var htmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
   entry: './src/main.js',
@@ -55,10 +56,18 @@ module.exports = {
           // other vue-loader options go here
         }
       },
-      {
+     /* {
         test: /\.js$/,
         loader: 'babel-loader',
         exclude: /node_modules/
+      },*/
+
+      {
+        test: /\.js$/,
+        loader: 'babel-loader',
+        options: {
+          plugins: ['syntax-dynamic-import']
+        }
       },
       {
         test: /\.(png|jpg|gif|svg)$/,
@@ -66,12 +75,21 @@ module.exports = {
         options: {
           name: '[name].[ext]?[hash]'
         }
-      }
+      },
+      { test: /\.(eot|woff|ttf)$/, loader: 'file-loader' }
     ]
   },
+  /*  plugins: [
+      new htmlWebpackPlugin({
+        template: '@/layout/layout.vue',
+        favicon: 'favicon.ico',
+        inject: true
+      })
+    ],*/
   resolve: {
     alias: {
-      'vue$': 'vue/dist/vue.esm.js'
+      'vue$': 'vue/dist/vue.esm.js',
+      '@': path.resolve(__dirname, './src')
     },
     extensions: ['*', '.js', '.vue', '.json']
   },
