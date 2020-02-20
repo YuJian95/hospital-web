@@ -8,6 +8,11 @@ Vue.use(ElementUI)
 
 Vue.config.productionTip = false
 
+// 引入常用的组件
+import tableList from '@/component/tableList'
+Vue.component('tableList',tableList)
+import tableTest from '@/component/tableTest'
+Vue.component('tableTest',tableTest)
 
 new Vue({
   el: '#app',

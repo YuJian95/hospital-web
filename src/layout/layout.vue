@@ -24,18 +24,16 @@
       <el-col :span="24" class="main">
         <aside :class="collapsed?'menu-collapsed':'menu-expanded'">
           <el-menu
-            default-active="/trueQuestion"
+            default-active="/hospitalDetail"
             class="el-menu-vertical-demo"
-            @open="handleOpen"
-            @close="handleClose"
-            active-text-color="#7A67EE"
+            active-text-color="#CCFFFF"
             unique-opened router v-show="!collapsed"
-            background-color="#E0EEEE"
+            background-color="#4E5CA4"
           >
             <el-submenu :index="index + 1" v-for="(item,index) in $router.options.routes" :key="index" v-if="!item.hidden">
               <template slot="title" class="tab-title">
-                <i :class="item.iconCls"></i>
-                <span>{{ item.name }}</span>
+                <i :class="item.iconCls" style="color: #FFFFFF"></i>
+                <span style="color: #FFFFFF;">{{ item.name }}</span>
               </template>
               <el-menu-item-group v-for="(child,index2) in item.children" :key="child.path" v-if="!child.hidden">
                 <el-menu-item :index="child.path" class="children-expanded">{{ child.name }}</el-menu-item>
@@ -48,9 +46,9 @@
           <div class="grid-content bg-purple-light">
             <el-col :span="24" class="breadcrumb-container">
               <!--              <strong class="title">{{$route.name}}</strong>-->
-              <el-breadcrumb separator="/" class="breadcrumb-inner">
-                <el-breadcrumb-item v-for="item in $route.matched" :key="item.path">{{ item.name }}</el-breadcrumb-item>
-              </el-breadcrumb>
+<!--              <el-breadcrumb separator="/" class="breadcrumb-inner">-->
+<!--                <el-breadcrumb-item v-for="item in $route.matched" :key="item.path">{{ item.name }}</el-breadcrumb-item>-->
+<!--              </el-breadcrumb>-->
             </el-col>
             <el-col :span="24" class="content-wrapper">
               <transition name="fade" mode="out-in">
@@ -66,6 +64,7 @@
 </template>
 
 <script>
+  import doctorPermission from '@/doctorPermission.js'
   export default {
     name: "home",
     data() {
@@ -87,14 +86,15 @@
       }
     },
     created() {
-      console.log(this.$route)
-      console.log(this.$router)
+      let permission = sessionStorage.getItem('permission')
+
     }
   }
 </script>
 
 <style lang="scss">
   $text-color: #ffffff;
+  $major-color: #4E5CA4;
   //%tab-color:
   .container {
     position: absolute;
@@ -104,7 +104,8 @@
     .header {
       height: 60px;
       line-height: 60px;
-      background: #bbdbfb;
+      /*background: #bbdbfb;*/
+      background: #F2F2F2;
       color: $text-color;
       .userinfo {
         text-align: right;
@@ -112,7 +113,8 @@
         float: right;
         .userinfo-inner {
           cursor: pointer;
-          color: $text-color;
+          /*<!--color: $text-color;-->*/
+          color: $major-color;
           font-size: 18px;
         }
       }
@@ -124,6 +126,7 @@
         border-color: rgba(238,241,146,0.3);
         border-right-width: 1px;
         border-right-style: solid;
+        background: #4270A8;
       }
       .logo-width {
         width: 230px;
@@ -180,11 +183,13 @@
       .menu-expanded {
         flex: 0 0 230px;
         width: 230px;
+        background-color: $major-color;
       }
       .children-expanded {
         height: 40px;
         line-height: 40px;
         margin-top: -4px;
+        color: $text-color;
       }
       .content-container {
         flex: 1;

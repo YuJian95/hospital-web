@@ -1,0 +1,58 @@
+//此页面作为比较常见的样式
+
+$major-blue-color: #4E5CA4;
+$gray-text-color: #A6A6A6;
+
+@mixin width-margin($width, $height) {
+  width: $width;
+  height: $height;
+  margin: 0 auto;
+}
+// 最右上角的按钮
+.button-box{
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  .add-button{
+    width: 80px;
+  }
+}
+
+// 进行是row还是column
+@mixin flex-direction($direction) {
+  display: flex;
+  flex-direction: $direction;
+}
+// 关于文字
+@mixin font-style($size, $color) {
+  font-size: $size;
+  color: $color;
+}
+// 作为左右两边出现的文字或者右边是input
+.info-in-box{
+  height: 50px;
+  line-height: 50px;
+  @include flex-direction(row);
+  .title{
+    @include font-style(16px, #000000);
+    margin-right: 20px;
+  }
+  .gray-text{
+    @include font-style(16px, $gray-text-color);
+  }
+  .input-box{
+    width: 70%;
+  }
+}
+// 较长的按钮
+.insure-button{
+  @include width-margin(200px, 100%);
+}
+// icon图的样式
+@mixin icon-style($width, $height) {
+  width: $width;
+  height: $height;
+}
+.gray-text{
+  @include font-style(16px, $gray-text-color);
+}

@@ -4,10 +4,12 @@
              label-width="0px" class="demo-ruleForm login-container login-background">
       <h3 class="title">挂号系统后台管理中心</h3>
       <el-form-item prop="account">
-        <el-input type="text" v-model="ruleForm2.account" auto-complete="off" placeholder="账号"></el-input>
+        <el-input type="text" v-model="ruleForm2.account" auto-complete="off"
+                  placeholder="账号" suffix-icon="el-icon-user-solid"></el-input>
       </el-form-item>
       <el-form-item prop="checkPass">
-        <el-input type="password" v-model="ruleForm2.checkPass" auto-complete="off" placeholder="密码"></el-input>
+        <el-input type="password" v-model="ruleForm2.checkPass" auto-complete="off"
+                  placeholder="密码" suffix-icon="el-icon-lock"></el-input>
       </el-form-item>
       <el-checkbox v-model="checked" checked class="remember">记住密码</el-checkbox>
       <el-form-item style="width:100%;">
@@ -18,6 +20,7 @@
 </template>
 
 <script>
+  import doctorPermission from '@/doctorPermission.js'
   export default {
     name: "login",
     data(){
@@ -57,9 +60,20 @@
               password: this.ruleForm2.checkPass
             };
             if (loginParams.username == "admin" && loginParams.password == "123456") {
+
+              // var that = this
+              // console.log(that.$router.options)
+              // if ( that.$router.options.routes.length <= that.$router.options.initRoute) {
+              //   doctorPermission.forEach(function (item,index) {
+              //     that.$router.options.routes.push(item)
+              //   })
+              // }
+
               _this.logining = false;
               sessionStorage.setItem('user', JSON.stringify(loginParams));
-              _this.$router.push({path: '/test1'});
+              // _this.$router.push({path: '/appointDetail'});
+              _this.$router.push({path: '/hospitalDetail'});
+              sessionStorage.setItem('permission','admin')
             } else {
               _this.logining = false;
               _this.$alert('用户名或密码错误！', '提示信息', {
@@ -74,7 +88,6 @@
       }
     },
     created() {
-      console.log("dsajlhfjd")
     }
   }
 </script>
