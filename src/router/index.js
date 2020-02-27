@@ -15,7 +15,7 @@ let routes = [{
   component: () => import('@/view/404/404'),
   hidden: true
 },
-  /*{
+  {
   path: '/',
   component: layout,
   name: '患者管理',
@@ -41,7 +41,7 @@ let routes = [{
       component: () => import('@/view/outCallManagement/outCallDetail'),
       name: '出诊详情'
     }]
-  }*/
+  },
   {
     path: '/',
     component: layout,

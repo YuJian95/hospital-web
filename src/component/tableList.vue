@@ -36,7 +36,7 @@
           width="tableAllData.option.width"
           align="center">
           <template slot-scope="scope">
-            <div v-show="edit != scope.row.ID || !isEdit">
+            <div v-show="edit !== scope.row.ID || !isEdit">
               <el-button
                 v-for="(item,index) in tableAllData.option.button"
                 :key = "item.name"
@@ -44,7 +44,7 @@
                 :type="item.type"
                 @click="emitIndex(scope.$index, scope.row, item.name)">{{item.name}}</el-button>
             </div>
-            <div v-show="isEdit && edit == scope.row.ID">
+            <div v-show="isEdit && edit === scope.row.ID">
               <el-button
                 size="mini"
                 type="primary"
@@ -54,6 +54,12 @@
                 size="mini"
                 type="success"
                 @click="emitIndex(scope.$index, scope.row, '修改')">修改</el-button>
+            </div>
+            <div v-show="isClickTreat && edit === scope.row.ID">
+              <el-button
+                size="mini"
+                type="warning"
+                @click="emitIndex(scope.$index, scope.row, '重新叫号')">重新叫号</el-button>
             </div>
           </template>
         </el-table-column>
@@ -71,10 +77,11 @@
     data() {
       return {
         isEdit: false,
-        edit: '', // 只有点击了编辑操作的才有用
+        edit: '', // 只有点击了编辑操作或者就诊操作的才有用
         saveEdit: {},// 作为编辑时的中间保留值
         showEdit: {},
-        selectData: {}
+        selectData: {},
+        isClickTreat: false // 只有医生页面的点击就诊才会出现
       }
     },
     methods: {
@@ -142,6 +149,11 @@
       editSelect: function (data,row) {
         this.editIndex(row)
         this.selectData = data
+      },
+      // 医生点击了某个患者的就诊按钮
+      clickTreat: function (ID) {
+        this.edit = ID
+        this.isClickTreat = true
       }
     },
     created() {
