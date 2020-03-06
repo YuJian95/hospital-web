@@ -3,10 +3,10 @@
     <el-row class="container">
       <el-col :span="24" class="header">
         <el-col :span="10" class="logo" :class="collapsed?'logo-collapse-width':'logo-width'">{{collapsed?'':sysName}}</el-col>
-        <el-col :span="10">
-          <div class="tools" @click.prevent="collapseFun">
-            <i class="fa fa-align-justify"></i>
-          </div>
+        <el-col :span="10" class="path-name">
+          <el-breadcrumb separator="/" class="path-inner">
+            <el-breadcrumb-item v-for="item in $route.matched" :key="item.path">{{ item.name }}</el-breadcrumb-item>
+          </el-breadcrumb>
         </el-col>
         <el-col :span="4" class="userinfo">
           <el-dropdown trigger="hover">
@@ -24,32 +24,36 @@
       <el-col :span="24" class="main">
         <aside :class="collapsed?'menu-collapsed':'menu-expanded'">
           <el-menu
-            default-active="/hospitalDetail"
+            :default-active="$route.path"
+            :collapse="isCollapse"
             class="el-menu-vertical-demo"
-            active-text-color="#CCFFFF"
-            unique-opened router v-show="!collapsed"
+            unique-opened
             background-color="#4E5CA4"
+            text-color="#ffffff"
+            active-text-color="#E6A23C"
           >
-            <el-submenu :index="index + 1" v-for="(item,index) in $router.options.routes" :key="index" v-if="!item.hidden">
-              <template slot="title" class="tab-title">
-                <i :class="item.iconCls" style="color: #FFFFFF"></i>
-                <span style="color: #FFFFFF;">{{ item.name }}</span>
+            <el-submenu :index="index + 1" v-for="(item,index) in $router.options.routes"
+                        :key="index" v-if="!item.hidden">
+              <template slot="title">
+                <i :class="item.iconCls" class="tab-icon"></i>
+                <span class="tab-title">{{ item.name }}</span>
               </template>
-              <el-menu-item-group v-for="(child,index2) in item.children" :key="child.path" v-if="!child.hidden">
-                <el-menu-item :index="child.path" class="children-expanded">{{ child.name }}</el-menu-item>
-              </el-menu-item-group>
+
+              <template v-for="(child,index2) in item.children"  v-if="!child.hidden" style="height: 50px;">
+                <router-link :to="child.path" :key="child.name" style="text-decoration: none">
+                  <el-menu-item :index="child.path" class="children-expanded">
+                    <i :class="child.iconCls" class="icon-color"></i>
+                    <span>{{ child.name }}</span>
+                  </el-menu-item>
+                </router-link>
+              </template>
+
             </el-submenu>
           </el-menu>
         </aside>
 
         <section class="content-container">
           <div class="grid-content bg-purple-light">
-            <el-col :span="24" class="breadcrumb-container">
-              <!--              <strong class="title">{{$route.name}}</strong>-->
-<!--              <el-breadcrumb separator="/" class="breadcrumb-inner">-->
-<!--                <el-breadcrumb-item v-for="item in $route.matched" :key="item.path">{{ item.name }}</el-breadcrumb-item>-->
-<!--              </el-breadcrumb>-->
-            </el-col>
             <el-col :span="24" class="content-wrapper">
               <transition name="fade" mode="out-in">
                 <router-view></router-view>
@@ -118,6 +122,16 @@
           font-size: 18px;
         }
       }
+      .path-name{
+        text-align: left;
+        color: $major-color;
+        margin-left: 30px;
+        .path-inner{
+          height: 60px;
+          line-height: 60px;
+          font-size: 16px;
+        }
+      }
       .logo {
         height: 60px;
         font-size: 22px;
@@ -151,11 +165,23 @@
       aside {
         flex: 0 0 230px;
         width: 230px;
-        .tab-title {
-          width: 100%;
+        // 一级菜单的icon
+        .tab-icon {
+          width: 22px;
+          font-size: 18px;
           display: flex;
           flex-direction: row;
-          justify-content: space-between;
+          justify-content: flex-start;
+          line-height: 56px;
+          color: #ffffff;
+        }
+        // 一级菜单的标题
+        .tab-title{
+          color: #ffffff;
+          font-size: 14px;
+          position: absolute;
+          top: 0;
+          left: 60px;
         }
         .el-menu {
           height: 100%;
@@ -186,8 +212,8 @@
         background-color: $major-color;
       }
       .children-expanded {
-        height: 40px;
-        line-height: 40px;
+        height: 50px;
+        line-height: 50px;
         margin-top: -4px;
         color: $text-color;
       }
@@ -201,9 +227,7 @@
             float: left;
             color: #475669;
           }
-          .breadcrumb-inner {
-            float: right;
-          }
+
         }
         .content-wrapper {
           background-color: $text-color;
@@ -211,5 +235,10 @@
         }
       }
     }
+  }
+  // 改变颜色
+  .children-expanded i{
+    font-size: 16px;
+    color: #ffffff;
   }
 </style>

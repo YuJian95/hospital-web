@@ -15,12 +15,12 @@ let routes = [{
   component: () => import('@/view/404/404'),
   hidden: true
 },
-  {
+  /*{
   path: '/',
   component: layout,
   name: '患者管理',
   redirect: '/patientManagement',
-  iconCls: 'el-icon-question', //图标样式class
+  iconCls: 'el-icon-user', //图标样式class
   children: [{
     path: '/appointDetail',
     component: () => import('@/view/patientManagement/appointDetail'),
@@ -35,13 +35,13 @@ let routes = [{
     component: layout,
     name: '出诊管理',
     redirect: '/outCallManagement',
-    iconCls: 'el-icon-question', //图标样式class
+    iconCls: 'el-icon-s-cooperation', //图标样式class
     children: [{
       path: '/outCallDetail',
       component: () => import('@/view/outCallManagement/outCallDetail'),
       name: '出诊详情'
     }]
-  },
+  },*/
   {
     path: '/',
     component: layout,
@@ -124,6 +124,45 @@ let routes = [{
       path: '/setUpDetail',
       component: () => import('@/view/setUpManagement/setUpDetail'),
       name: '排版详情'
+    }]
+  }, {
+    path: '/',
+    component: layout,
+    name: '权限管理',
+    redirect: '/userPermission',
+    iconCls: 'el-icon-key', //图标样式class
+    children: [{
+      path: '/userList',
+      iconCls: 'el-icon-guide',
+      component: () => import('@/view/userPermission/user/userList'),
+      name: '用户列表'
+    }, {
+      path: '/roleList',
+      component: () => import('@/view/userPermission/role/roleList'),
+      name: '角色列表'
+    }, {
+      path: '/menuList',
+      component: () => import('@/view/userPermission/menu/menuList'),
+      name: '菜单列表'
+    }, {
+      path: '/resourceList',
+      component: () => import('@/view/userPermission/resource/resourceList'),
+      name: '资源列表'
+    }, {
+      path: '/addMenu',
+      component: () => import('@/view/userPermission/menu/addMenu'),
+      name: '添加菜单',
+      hidden: true
+    }, {
+      path: '/editMenu',
+      component: () => import('@/view/userPermission/menu/editMenu'),
+      name: '编辑菜单',
+      hidden: true
+    }, {
+      path: '/sonMenu',
+      component: () => import('@/view/userPermission/menu/sonMenu'),
+      name: '二级菜单',
+      hidden: true
     }]
   }
   ]

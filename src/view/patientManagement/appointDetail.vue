@@ -35,6 +35,7 @@
 </template>
 
 <script>
+  import { login } from '@/api/login.js'
   import axios from 'axios'
     export default {
         name: "show1",
@@ -175,19 +176,14 @@
         },
         // 测试接口
         testAPI: function () {
-          var url
-          // url = 'http://music.163.com/api/playlist/detail?id=37880978'
-          // url='http://localhost:8081/api/playlist/19723756'
-          url = '/hospital/power/account/login'
-          // url = '/163/api/playlist/detail?id=37880978'
-          axios.get(url)
-            .then(function(response) {
-              console.log(response);
-            })
-            .catch(function(error) {
-              console.log(233);
-            });
-          // console.log(1);
+          let userName = 'admin'
+          let password = 'admin'
+          axios.get('/hospital/power/account/login/' + userName + '/' + password).then(res => {
+            console.log(res)
+          })
+          // login(userName,password).then(res => {
+          //   console.log(res)
+          // })
         }
         }
     }

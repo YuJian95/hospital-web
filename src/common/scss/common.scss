@@ -34,6 +34,7 @@ $gray-text-color: #A6A6A6;
   line-height: 50px;
   @include flex-direction(row);
   .title{
+    width: auto;
     @include font-style(16px, #000000);
     margin-right: 20px;
   }

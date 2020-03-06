@@ -1,7 +1,6 @@
 var path = require('path')
 var webpack = require('webpack')
 // var htmlWebpackPlugin = require('html-webpack-plugin')
- let url = 'http://localhost:8080'
 module.exports = {
   entry: './src/main.js',
   output: {
@@ -103,7 +102,7 @@ module.exports = {
     proxy: {
       '/hospital': {
         target: 'http://localhost:8080',
-        pathRewrite: { ['^' + url]: '/' },
+        pathRewrite: { ['^' + process.env.VUE_APP_BASE_API]: '/' },
         changeOrigin: true
       }
     }

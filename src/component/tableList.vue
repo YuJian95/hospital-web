@@ -14,11 +14,16 @@
           :width="item.width"
           align="center">
           <template slot-scope="scope">
-            <span v-show="item.option == '' || !isEdit || edit != scope.row.ID ">{{ scope.row[item.prop]}}</span>
-            <div v-show="item.option == 'input' && edit == scope.row.ID && isEdit">
+<!--            当显示的不是状态按钮时，即单纯写在页面上-->
+            <div v-show="item.option !== 'radio' && item.option !== 'icon'">
+              <span v-show="item.option === '' || !isEdit || edit !== scope.row.ID ">{{ scope.row[item.prop]}}</span>
+            </div>
+<!--            点点击了编辑变成输入框-->
+            <div v-show="item.option === 'input' && edit === scope.row.ID && isEdit">
               <el-input  size="small" v-model="scope.row[item.prop]" style="width: 90%;"/>
             </div>
-            <div v-show="item.option == 'select' && edit == scope.row.ID && isEdit">
+<!--            当点击了编辑变成了下拉框-->
+            <div v-show="item.option === 'select' && edit === scope.row.ID && isEdit">
               <el-select v-model="scope.row[item.prop]" placeholder="请选择"
                          style="width: 90%;" @change="selectDataFun(item.prop)">
                 <el-option
@@ -28,6 +33,19 @@
                   :value="item2.ID">
                 </el-option>
               </el-select>
+            </div>
+<!--            权限处的状态按钮-->
+            <div v-show="item.option === 'radio'">
+              <el-switch
+                @change="handleStatusChange(scope.$index, scope.row)"
+                :active-value="1"
+                :inactive-value="0"
+                v-model="scope.row.status">
+              </el-switch>
+            </div>
+<!--            权限处的icon图标-->
+            <div v-show="item.option === 'icon'" class="icon-size">
+              <i :class="scope.row.icon" ></i>
             </div>
           </template>
         </el-table-column>
@@ -166,5 +184,9 @@
   .table-box{
     @include width-margin(100%, 100%);
     margin-top: 15px;
+  }
+  // 给权限的icon图标增大
+  .icon-size{
+    font-size: 20px;
   }
 </style>
