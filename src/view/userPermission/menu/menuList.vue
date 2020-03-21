@@ -14,7 +14,9 @@
 </template>
 
 <script>
-    export default {
+  import {getParentPermission} from "@/api/permission";
+
+  export default {
         name: "menuList",
       data() {
           return {
@@ -51,42 +53,7 @@
                 width: '100',
                 option: 'radio'
               }],
-              tableData: [{
-                ID: 1,
-                menuTitle: '医院管理',
-                type: '一级',
-                url: '/hospitalManagement',
-                icon: 'el-icon-office-building',
-                status: 1
-              }, {
-                ID: 2,
-                menuTitle: '专科管理',
-                type: '一级',
-                url: '/departmentManagement',
-                icon: 'el-icon-guide',
-                status: 1
-              }, {
-                ID: 3,
-                menuTitle: '医生管理',
-                type: '一级',
-                url: '/doctorManagement',
-                icon: 'el-icon-s-custom',
-                status: 0
-              }, {
-                ID: 4,
-                menuTitle: '排版管理',
-                type: '一级',
-                url: '/departmentManagement',
-                icon: 'el-icon-document',
-                status: 1
-              }, {
-                ID: 5,
-                menuTitle: '权限管理',
-                type: '一级',
-                url: '/userPermission',
-                icon: 'el-icon-key',
-                status: 1
-              }],
+              tableData: [],
               option: {
                 width: '250',
                 button: [{
@@ -138,9 +105,38 @@
               parentID: row.ID
             }
           })
+        },
+        // 将权限分级，0位一级即目录，1为二级
+        getMenuText(value) {
+          if (value === 0) {
+            return '一级'
+          } else if (value === 1) {
+            return '二级'
+          }
+        },
+        // 获取所有的权限父级和子级
+        getAllPermission: function () {
+          let _this = this
+          getParentPermission(1).then(res => {
+            if (res.code === 200 && res.data.length > 0) {
+              res.data.forEach(function (item, index) {
+                _this.tableAllData.tableData.push({
+                  ID: item.id,
+                  menuTitle: item.name,
+                  type: _this.getMenuText(item.type),
+                  url: item.url,
+                  icon: item.icon,
+                  status: item.status
+                })
+              })
+            }
+          })
         }
-      }
+      },
+    mounted() {
+      this.getAllPermission()
     }
+  }
 </script>
 
 <style scoped lang="scss">

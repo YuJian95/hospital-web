@@ -8,9 +8,9 @@
           <el-select v-model="selectHospitalID" placeholder="请选择">
             <el-option
               v-for="item in hospitalData"
-              :key="item.hospitalID"
+              :key="item.id"
               :label="item.name"
-              :value="item.hospitalID">
+              :value="item.id">
             </el-option>
           </el-select>
         </div>
@@ -20,9 +20,9 @@
           <el-select v-model="selectDepartmentID" placeholder="请选择">
             <el-option
               v-for="item in departmentSelectData"
-              :key="item.departmentID"
+              :key="item.id"
               :label="item.name"
-              :value="item.departmentID">
+              :value="item.id">
             </el-option>
           </el-select>
         </div>
@@ -35,6 +35,7 @@
                      class="add-button" @click="dialogFormVisible = true">添加</el-button>
         </div>
         <table-list :tableAllData="tableAllData" @getTableData="getTableData" ref="tableList"></table-list>
+        <page-pagination :page-list="pageList" ref="pagePagination"></page-pagination>
       </div>
 <!--      弹出框-->
       <el-dialog title="添加门诊" :visible.sync="dialogFormVisible" width="35%"  @close="cancelModal">
@@ -43,9 +44,9 @@
             <el-select v-model="selectOutpatientID" placeholder="请选择" @change="selectOutpatient">
               <el-option
                 v-for="item in outpatientSelectData"
-                :key="item.outpatientID"
+                :key="item.id"
                 :label="item.name"
-                :value="item.outpatientID"
+                :value="item.id"
                 :disabled="item.disabled">
               </el-option>
             </el-select>
@@ -56,6 +57,8 @@
           <el-button type="primary" @click="addOutpatient()">确 定</el-button>
         </div>
       </el-dialog>
+      <!--    用作删除的弹框-->
+      <delete-dialog :dialog="deleteDialog" ref="deleteDialog"></delete-dialog>
     </div>
 </template>
 
@@ -65,35 +68,11 @@
       data() {
           return {
             // 上面的下拉框的医院的数据
-            hospitalData: [{
-              hospitalID: '1001',
-              name: '大学城总院'
-            }, {
-              hospitalID: '1002',
-              name: '顺德分院'
-            }, {
-              hospitalID: '1003',
-              name: '越秀区分院'
-            }, {
-              hospitalID: '1004',
-              name: '白云区分院'
-            }],
-            selectHospitalID: '',
+            hospitalData: [],
+            selectHospitalID: 0,
             // 顶部的专科信息
-            departmentSelectData: [{
-              departmentID: '1001',
-              name: '儿科'
-            }, {
-              departmentID: '1002',
-              name: '内科'
-            }, {
-              departmentID: '1003',
-              name: '妇科'
-            }, {
-              departmentID: '1004',
-              name: '产科'
-            }],
-            selectDepartmentID: '',
+            departmentSelectData: [],
+            selectDepartmentID: 0,
             // 表格数据
             tableAllData: {
               tableTitle: [{
@@ -125,10 +104,6 @@
                 width: '250',
                 button: [{
                   size: 'mini',
-                  type: 'primary',
-                  name: '查看诊室'
-                }, {
-                  size: 'mini',
                   type: 'danger',
                   name: '删除'
                 }]
@@ -154,7 +129,20 @@
               name: '内分泌',
               disabled: false
             }],
-            selectOutpatientID: ''
+            selectOutpatientID: '',
+            // 底部分页的数据
+            pageList: {
+              pageNum: 1,
+              pageSize: 5,
+              total: 0
+            },
+            // 删除的模态框的数据
+            deleteDialog: {
+              title: '门诊',
+              dialogFormVisible: false,
+              id: ''
+            },
+            deleteScope: {}, // 用作当从组件传过来确认删除时用的
           }
       },
       methods: {
@@ -213,8 +201,10 @@
         }
       },
       mounted() {
-        this.selectHospitalID = this.$route.query.hospitalID
-        this.selectDepartmentID = this.$route.query.departmentID
+        this.hospitalData = JSON.parse(sessionStorage.getItem('hospitalList'));
+        this.departmentSelectData = JSON.parse(sessionStorage.getItem('departmentList'));
+        this.selectHospitalID = this.$route.query.hospitalID;
+        this.selectDepartmentID = this.$route.query.departmentID;
         this.compareOutpatient()
       }
     }

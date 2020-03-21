@@ -1,6 +1,7 @@
 <!--登录上来的医生查看自己的患者挂号的情况-->
 <template>
     <div class="out-box">
+
 <!--      顶部的选择条件-->
       <div class="top-row-box">
         <div class="info-in-box margin-right">
@@ -49,7 +50,7 @@
               timeID: 2,
               time: '14:00~18:00'
             }],
-            selectTimeID: '',
+            selectTimeID: 1,
             // 表格数据
             tableAllData: {
               tableTitle: [{
@@ -172,7 +173,10 @@
         },
         // 用户点击了查看按钮
         getPatientDetailByID: function (scope) {
-          console.log(scope.treatCardID)
+          this.$router.push({
+            path: '/patientMedicalRecord',
+            query: { ID: scope.treatCardID }
+          });
         },
         // 测试接口
         testAPI: function () {
@@ -190,7 +194,7 @@
 </script>
 
 <style lang="scss">
-  @import "../.././common/scss/common.scss";
+  @import "../../../common/scss/common";
   .out-box{
     @include width-margin(90%, 100%);
     .top-row-box{

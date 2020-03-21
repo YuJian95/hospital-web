@@ -2,9 +2,13 @@
   <div>
     <template>
       <el-table
+        v-loading="loading"
+        element-loading-text="拼命加载中"
+        element-loading-spinner="el-icon-loading"
+        element-loading-background="rgba(0, 0, 0, 0.8)"
         :data="tableAllData.tableData"
         border
-        max-height="430px"
+        :max-height="tableAllData.maxHeight"
         class="table-box">
         <el-table-column
           v-for="(item,index) in tableAllData.tableTitle"
@@ -15,9 +19,13 @@
           align="center">
           <template slot-scope="scope">
 <!--            当显示的不是状态按钮时，即单纯写在页面上-->
-            <div v-show="item.option !== 'radio' && item.option !== 'icon'">
+            <div v-show="item.option !== 'radio' && item.option !== 'icon' && item.option !== 'time'">
               <span v-show="item.option === '' || !isEdit || edit !== scope.row.ID ">{{ scope.row[item.prop]}}</span>
             </div>
+<!--            当显示的是时间-->
+            <data v-show="item.option === 'time'">
+              <span>{{ scope.row[item.prop] | dateTime('date')}}</span>
+            </data>
 <!--            点点击了编辑变成输入框-->
             <div v-show="item.option === 'input' && edit === scope.row.ID && isEdit">
               <el-input  size="small" v-model="scope.row[item.prop]" style="width: 90%;"/>
@@ -50,6 +58,7 @@
           </template>
         </el-table-column>
         <el-table-column
+          v-if="tableAllData.option !== ''"
           label="操作"
           width="tableAllData.option.width"
           align="center">
@@ -90,7 +99,12 @@
   export default {
     name: "tableTest",
     props: {
-      tableAllData: { }
+      tableAllData: {
+        maxHeight: {
+          type: String,
+          default: '430px'
+        }
+      }
     },
     data() {
       return {
@@ -99,7 +113,8 @@
         saveEdit: {},// 作为编辑时的中间保留值
         showEdit: {},
         selectData: {},
-        isClickTreat: false // 只有医生页面的点击就诊才会出现
+        isClickTreat: false, // 只有医生页面的点击就诊才会出现
+        // loading: true // 用于表格的加载中
       }
     },
     methods: {
@@ -110,7 +125,7 @@
        * @param buttonName string 用于传达点击的按钮的名称
        * **/
       emitIndex: function (scopeIndex, scopeRow, buttonName) {
-        console.log(scopeRow)
+        console.log(scopeRow);
         let option = {
           scopeIndex: scopeIndex,
           scopeRow: scopeRow,
@@ -141,15 +156,15 @@
        * **/
       // @param row 为点击的那行的数据
       editIndex: function (row) {
-        this.showEdit = row
+        this.showEdit = row;
         this.saveEdit = JSON.parse(JSON.stringify(row))
-        this.edit = row.ID
+        this.edit = row.ID;
         this.isEdit = true
       },
       // 点击了编辑之后的取消按钮
       cancelEdit: function () {
-        this.isEdit = false
-        this.edit = ''
+        this.isEdit = false;
+        this.edit = '';
         // 此处是用户选择了取消，所以要将保留的值一个个传回去
         for (let item in this.saveEdit) {
           this.showEdit[item] = this.saveEdit[item]
@@ -158,7 +173,12 @@
       // 点击了编辑之后的修改按钮
       // 因为showEdit是指向那行数据的地址的，所以会相互影响，进而确定修改则直接传值
       handleUpdate: function () {
-        this.isEdit = false
+        this.$notify({
+          title: '成功',
+          message: '更新成功',
+          type: 'success',
+        });
+        this.isEdit = false;
         this.edit = ''
       },
       /**
@@ -170,11 +190,17 @@
       },
       // 医生点击了某个患者的就诊按钮
       clickTreat: function (ID) {
-        this.edit = ID
+        this.edit = ID;
         this.isClickTreat = true
       }
     },
-    created() {
+    computed: {
+      loading: function () {
+        if (this.tableAllData.tableData.length !== 0 || this.tableAllData.dataNull) {
+          return false
+        }
+        return true
+      }
     }
   }
 </script>

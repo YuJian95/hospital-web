@@ -5,7 +5,7 @@
         <el-col :span="10" class="logo" :class="collapsed?'logo-collapse-width':'logo-width'">{{collapsed?'':sysName}}</el-col>
         <el-col :span="10" class="path-name">
           <el-breadcrumb separator="/" class="path-inner">
-            <el-breadcrumb-item v-for="item in $route.matched" :key="item.path">{{ item.name }}</el-breadcrumb-item>
+            <el-breadcrumb-item v-for="item in $route.matched" :key="item.path">{{ item.meta.title }}</el-breadcrumb-item>
           </el-breadcrumb>
         </el-col>
         <el-col :span="4" class="userinfo">
@@ -25,7 +25,6 @@
         <aside :class="collapsed?'menu-collapsed':'menu-expanded'">
           <el-menu
             :default-active="$route.path"
-            :collapse="isCollapse"
             class="el-menu-vertical-demo"
             unique-opened
             background-color="#4E5CA4"
@@ -35,15 +34,15 @@
             <el-submenu :index="index + 1" v-for="(item,index) in $router.options.routes"
                         :key="index" v-if="!item.hidden">
               <template slot="title">
-                <i :class="item.iconCls" class="tab-icon"></i>
-                <span class="tab-title">{{ item.name }}</span>
+                <i :class="item.meta.icon" class="tab-icon"></i>
+                <span class="tab-title">{{ item.meta.title }}</span>
               </template>
 
               <template v-for="(child,index2) in item.children"  v-if="!child.hidden" style="height: 50px;">
                 <router-link :to="child.path" :key="child.name" style="text-decoration: none">
                   <el-menu-item :index="child.path" class="children-expanded">
-                    <i :class="child.iconCls" class="icon-color"></i>
-                    <span>{{ child.name }}</span>
+                    <i :class="child.meta.icon" class="icon-color"></i>
+                    <span>{{ child.meta.title }}</span>
                   </el-menu-item>
                 </router-link>
               </template>
@@ -68,7 +67,9 @@
 </template>
 
 <script>
-  import doctorPermission from '@/doctorPermission.js'
+  import {getPermission} from "@/permission";
+  import {getToken} from "@/utils/auth";
+
   export default {
     name: "home",
     data() {
@@ -90,8 +91,11 @@
       }
     },
     created() {
-      let permission = sessionStorage.getItem('permission')
-
+      if (getToken()) {
+        getPermission()
+      }
+      console.log(this.$router)
+      console.log('skdlfjdf')
     }
   }
 </script>

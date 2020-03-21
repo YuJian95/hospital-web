@@ -21,7 +21,8 @@
 
 <script>
   import {getCookie, setCookie} from "@/utils/cookies";
-  import { login } from "@/api/login";
+  import {getPermission} from "@/permission";
+  import {getToken} from "@/utils/auth";
 
   export default {
     name: "login",
@@ -59,8 +60,10 @@
                 setCookie("username",this.ruleForm2.username,15);
                 setCookie("password",this.ruleForm2.password,15);
               }
-              _this.$router.push({path: this.redirect || '/hospitalDetail'});
+
+              _this.$router.push({path: this.redirect || '/home'});
               _this.loading = false
+
             }).catch(() => {
               _this.loading = false;
               _this.$alert('用户名或密码错误！', '提示信息', {
@@ -72,6 +75,7 @@
             return false;
           }
         });
+
       }
     },
     created() {

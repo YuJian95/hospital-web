@@ -9,29 +9,29 @@
         <div class="info-out-box">
           <div class="info-in-box">
             <span class="title">编号：</span>
-            <span class="gray-text">1001</span>
+            <span class="gray-text">{{hospitalData.hospitalID}}</span>
           </div>
           <div class="info-in-box">
             <span class="title">名称：</span>
-            <span class="gray-text">XXX大学城总院</span>
+            <span class="gray-text">{{hospitalData.name}}</span>
           </div>
           <div class="info-in-box">
             <span class="title">地点：</span>
-            <span class="gray-text">广州番禺大学城总院</span>
+            <span class="gray-text">{{hospitalData.address}}</span>
           </div>
           <div class="info-in-box">
             <span class="title">电话：</span>
-            <span class="gray-text">020-1234567</span>
+            <span class="gray-text">{{hospitalData.phone}}</span>
           </div>
         </div>
-        <img src="../.././assets/hospital3.jpg" class="picture-box">
+          <img :src="hospitalData.picture" class="picture-box">
       </div>
       <div class="brief-box">
         <span class="title">简介：</span>
         <el-input
           type="textarea"
           placeholder="请输入内容"
-          v-model="textarea2"
+          v-model="hospitalData.description"
           class="brief"
           maxlength="1000"
           show-word-limit
@@ -42,23 +42,24 @@
 </template>
 
 <script>
-    export default {
+
+export default {
         name: "checkHospital",
       data() {
           return {
-            textarea2: ''
+            hospitalData: {}
           }
       },
       created() {
-          console.log(this.$route.query)
+          this.hospitalData = JSON.parse(sessionStorage.getItem('hospitalInfo'));
       },
       methods: {
           // 点击编辑跳转到编辑医院数据的页面
         toEditHospital: function () {
           this.$router.push({
-            path: '/addOrEditHospital',
+            path: '/editHospital',
             query: {
-              status: 'edit'
+              hospitalInfo: this.hospitalDatao
             }
           })
         }

@@ -32,24 +32,21 @@
           <span class="gray-text">甲状腺</span>
         </div>
       </div>
-      <div class="picture-box">
-        <img src="../.././assets/hospital3.jpg" class="picture">
+      <div class="brief-box">
+        <span class="title">简介：</span>
+        <el-input
+          type="textarea"
+          placeholder="请输入内容"
+          v-model="doctorBrief"
+          class="brief"
+          maxlength="500"
+          show-word-limit
+          disabled="true"
+          :autosize="{ minRows: 2, maxRows: 5}">
+        </el-input>
       </div>
-
     </div>
-    <div class="brief-box">
-      <span class="title">简介：</span>
-      <el-input
-        type="textarea"
-        placeholder="请输入内容"
-        v-model="doctorBrief"
-        class="brief"
-        maxlength="500"
-        show-word-limit
-        :autosize="{ minRows: 2, maxRows: 5}">
-      </el-input>
     </div>
-  </div>
 </template>
 
 <script>
@@ -65,10 +62,7 @@
           // 跳转到编辑医生页面
         toEditDoctor: function () {
           this.$router.push({
-            path: '/addEditDoctor',
-            query: {
-              status: 'edit'
-            }
+            path: '/editDoctor'
           })
         }
       }
@@ -94,50 +88,30 @@
     }
     // 中间的信息
     .info-picture-box{
-      @include width-margin(95%, 100%);
+      @include width-margin(100%, 100%);
       @include flex-direction(row);
       margin-top: 20px;
       .info-out-box{
         width: 50%;
         height: 100%;
       }
-      .picture-box{
-        width: 50%;
-        height: 100%;
-        @include flex-direction(row);
-        justify-content: center;
-        align-items: center;
-        .picture {
-          width: 300px;
-          height: 200px;
-          margin-right: 40px;
-        }
-        .change-icon{
-          @include icon-style(70px, 70px);
-          margin-right: 40px;
-        }
-      }
-    }
-
-    // 底部的简介
-    .brief-box{
-      @include width-margin(95%, 100%);
-      @include flex-direction(column);
-      text-align: left;
-      .title{
-        width: 100%;
-        height: 40px;
-        line-height: 40px;
-        @include font-style(16px, #000000);
-      }
-      .brief{
-        @include width-margin(60%, 100%);
+      .brief-box{
+        @include width-margin(50%,auto);
+        @include flex-direction(column);
+        text-align: center;
         margin-left: 5%;
+        .title{
+          width: 100%;
+          height: 40px;
+          line-height: 40px;
+          @include font-style(16px, #000000);
+        }
+        .brief{
+          @include width-margin(80%, auto);
+          margin-left: 5%;
+        }
       }
     }
   }
 
-  .hide .el-upload--picture-card {
-    display: none;
-  }
 </style>

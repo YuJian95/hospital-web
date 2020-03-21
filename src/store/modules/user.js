@@ -1,10 +1,12 @@
-import { login } from '@/api/login'
+import { login, getUserInfo } from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
+import Cookie from 'js-cookie'
 
 const user = {
   state: {
     token: getToken(),
     name: '',
+    userId: '',
     avatar: '',
     roles: []
   },
@@ -16,8 +18,8 @@ const user = {
     SET_NAME: (state, name) => {
       state.name = name
     },
-    SET_AVATAR: (state, avatar) => {
-      state.avatar = avatar
+    SET_UserID: (state, userId) => {
+      state.userId = userId
     },
     SET_ROLES: (state, roles) => {
       state.roles = roles
@@ -42,22 +44,23 @@ const user = {
     },
 
     // 获取用户信息
-    GetInfo({ commit, state }) {
+    GetInfo({ commit }) {
       return new Promise((resolve, reject) => {
-        getInfo().then(response => {
+        getUserInfo().then(response => {
           const data = response.data
-          if (data.roles && data.roles.length > 0) { // 验证返回的roles是否是一个非空数组
-            commit('SET_ROLES', data.roles)
+          if (data.name && data.name.length > 0) { // 验证返回的roles是否是一个非空数组
+            commit('SET_NAME', data.name)
           } else {
             reject('getInfo: roles must be a non-null array !')
           }
-          commit('SET_NAME', data.username)
-          commit('SET_AVATAR', data.icon)
+          commit('SET_UserID', data.id);
+          Cookie.set('userID', data.id);
           resolve(response)
         }).catch(error => {
           reject(error)
         })
       })
+      return true
     },
 
     // 登出
