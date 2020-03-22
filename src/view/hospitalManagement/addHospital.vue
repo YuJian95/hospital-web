@@ -10,7 +10,6 @@
       data() {
           return {
             hospitalData: {
-              hospitalID: '',
               name: '',
               address: '',
               phone: '',

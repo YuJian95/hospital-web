@@ -9,10 +9,11 @@ import {getCookie, setCookie} from "@/utils/cookies";
 
 export function getPermission() {
 
-  if (getCookie('username') === 'admin' && router.options.routes.length < 4) {
+  if (getCookie('username') === 'admin' ) {
+    let array = constantRouterMap.concat(systemRouterMap);
+    router.options.routes = array;
     router.onReady(() => {
-      let array = constantRouterMap.concat(systemRouterMap);
-      router.options.routes = array;
+
       router.addRoutes(array)
     });
   }

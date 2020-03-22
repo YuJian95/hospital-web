@@ -52,13 +52,13 @@
         show-word-limit>
       </el-input>
     </div>
-    <el-button class="insure-button" type="primary" style="margin-top: 15px;" @click="validate">确定</el-button>
+    <el-button class="insure-button" type="primary" style="margin-top: 15px;" @click="uploadPicture">确定</el-button>
   </div>
 </template>
 
 <script>
-  import {addDoctor} from "@/api/doctor";
-
+  import {addHospital, updateHospital} from "@/api/hospital";
+  import {tips} from "@/common/js/optionTips";
   import axios from 'axios'
   import { getToken } from "@/utils/auth";
 
@@ -77,7 +77,8 @@
         hideUpload: false,
         fileList: [],
         hospitalData: {},
-        fullscreenLoading: false // 进行整个屏幕的加载的
+        fullscreenLoading: false, // 进行整个屏幕的加载的
+        isValidate: true, // 用作表单的验证
       }
     },
     methods: {
@@ -103,21 +104,55 @@
       //  进行表单的校验
       validate: function() {
         for (let item in this.hospitalData) {
-            if (item !== 'hospitalID' && item !== 'isEdit' && item !== 'picture') {
-              if (this.hospitalData[item] === '') {
-                return false
-              } // end if(this.hospitalData[item] === '')
-            } // end if
+          if (item !== 'picture') {
+            if (this.hospitalData[item] === '' && this.hospitalData[item] === undefined
+              && this.hospitalData[item] === null) {
+              this.isValidate = false;
+            } // end if(this.hospitalData[item] === '')
+          } // end if
         }
         if (!this.hospitalData.isEdit) {
           if (!this.hideUpload) {
-            return false
+            this.isValidate = false;
           }
         }
-
-        return true
+        if (isValidate) {
+          this.uploadPicture() // 上传到七牛云
+        }
       },
+      // 上传照片到七牛云
+      uploadPicture: function() {
+        this.fullscreenLoading = true;
+        const url = 'http://localhost:8080/hospital/picture/upload';
+        const config = {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'Authorization': getToken()
+          }
+        };
+        const param = new FormData();
+        // 将图片加入formdata
+        param.append('file', this.imgFile.raw);
+        axios.post(url, param, config).then(res => {
+          if (res.data.code === 200) {
+            this.imgUrl = res.data.data;
+            if (this.hospitalData.isEdit) {
+              // 修改医院
+              this.updateHospital()
+            } else {
+              // 添加医院
+              this.addHospitalInfo()
+            }
 
+          }
+        }).catch(() => {
+          this.fullscreenLoading = false;
+          this.$notify.error({
+            title: '错误',
+            message: '修改医院失败，请检查网络或者电话号码是否重复'
+          });
+        })
+      },
       // 向数据库进行添加医院信息的操作
       addHospitalInfo: function () {
         addHospital({
@@ -147,10 +182,10 @@
           }
         }).catch(() => {
           this.fullscreenLoading = false;
-            this.$notify.error({
-              title: '错误',
-              message: '添加医院失败，请检查网络或者电话号码是否重复'
-            });
+          this.$notify.error({
+            title: '错误',
+            message: '添加医院失败，请检查网络或者电话号码是否重复'
+          });
         })
       },
       // 向数据库进行添加医院信息的操作
@@ -218,7 +253,7 @@
         justify-content: center;
         align-items: center;
         .picture {
-          width: 300px;
+          width: 250px;
           height: 200px;
           margin-right: 30px;
         }
