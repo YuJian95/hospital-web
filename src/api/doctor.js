@@ -37,3 +37,10 @@ export function deleteDoctor(id) {
     method: 'delete'
   })
 }
+// 获取某个医生的信息
+export function getDoctorInfo(doctorId) {
+  return request({
+    url: '/hospital/doctor/' + doctorId,
+    method: 'get'
+  })
+}

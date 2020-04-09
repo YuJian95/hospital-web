@@ -39,6 +39,13 @@ const filters = {
     } else if (value) {
       return '编辑'
     }
+  },
+  // 获取性别的文字
+  getGenderText(num) {
+    if (num === 1) {
+      return '男'
+    }
+    return '女'
   }
 };
 

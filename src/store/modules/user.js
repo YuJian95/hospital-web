@@ -1,6 +1,7 @@
 import { login, getUserInfo } from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import Cookie from 'js-cookie'
+import SHA256 from 'js-sha256';
 
 const user = {
   state: {
@@ -29,13 +30,14 @@ const user = {
   actions: {
     // 登录
     Login({ commit }, userInfo) {
+      console.log(SHA256(userInfo.password));
       const username = userInfo.username.trim()
       return new Promise((resolve, reject) => {
-        login(username, userInfo.password).then(response => {
+        login(username, SHA256(userInfo.password)).then(response => {
           console.log(response)
-          const token = response.data
-          commit('SET_TOKEN', token)
-          setToken(token)
+          const token = response.data;
+          commit('SET_TOKEN', token);
+          setToken(token);
           resolve()
         }).catch(error => {
           reject(error)
@@ -47,7 +49,8 @@ const user = {
     GetInfo({ commit }) {
       return new Promise((resolve, reject) => {
         getUserInfo().then(response => {
-          const data = response.data
+          const data = response.data;
+          sessionStorage.setItem('accountID', data.accountId);
           if (data.name && data.name.length > 0) { // 验证返回的roles是否是一个非空数组
             commit('SET_NAME', data.name)
           } else {

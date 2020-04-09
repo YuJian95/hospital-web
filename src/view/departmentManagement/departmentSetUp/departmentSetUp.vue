@@ -131,7 +131,6 @@
               this.hospitalData = res.data.list;
               this.selectHospitalID = res.data.list[0].id;
               this.getDoctorDepartmentList();
-              sessionStorage.setItem('hospitalList', JSON.stringify(this.hospitalData))
             }
           }).catch(() => {
             tips('error', '获取医院信息失败');
@@ -139,11 +138,9 @@
         },
         // 获取所有的专科用于添加数据
         getAllDepartment: function() {
-            let _this = this;
           getDepartmentList(this.pageList.pageNum, this.pageList.pageSize, this.searchDepartment).then(res => {
             if (res.code === 200 && res.data.list.length >0 ){
               this.departmentSelectData = res.data.list;
-              sessionStorage.setItem('departmentList', JSON.stringify(this.departmentSelectData))
             }
           }).catch(() => {
             tips('error', '获取专科信息失败');
@@ -155,6 +152,7 @@
           let _this = this;
           getDoctorDepartmentList(this.selectHospitalID, this.pageList.pageNum, this.pageList.pageSize)
             .then(res => {
+              console.log(res)
               if (res.code === 200) {
                 if (res.data.list !== null) {
                   this.pageList = {
@@ -182,7 +180,8 @@
         //
         // 点击查看门诊按钮跳转到门诊的排版页面
         toOutpatient: function(row) {
-            this.$router.push({
+          sessionStorage.setItem('hospitalList', JSON.stringify(this.hospitalData));
+          this.$router.push({
               path: '/outpatientSetUp',
               query: {
                 departmentID: row.ID,

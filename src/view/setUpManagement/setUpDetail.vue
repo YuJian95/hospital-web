@@ -5,24 +5,26 @@
     <div class="top-row-box">
       <div class="info-in-box margin-right">
         <span class="title">医院：</span>
-        <el-select v-model="selectHospitalID" placeholder="请选择" style="width: 70%;">
+        <el-select v-model="selectHospitalID" placeholder="请选择" style="width: 70%;"
+                   @change="getHospitalDepartmentList">
           <el-option
             v-for="item in hospitalData"
-            :key="item.hospitalID"
+            :key="item.id"
             :label="item.name"
-            :value="item.hospitalID">
+            :value="item.id">
           </el-option>
         </el-select>
       </div>
 
       <div class="info-in-box margin-right">
         <span class="title">专科：</span>
-        <el-select v-model="selectDepartmentID" placeholder="请选择" style="width: 70%;">
+        <el-select v-model="selectDepartmentID" placeholder="请选择" style="width: 70%;"
+                   @change="getOutpatientByHospital">
           <el-option
             v-for="item in departmentSelectData"
-            :key="item.departmentID"
+            :key="item.id"
             :label="item.name"
-            :value="item.departmentID">
+            :value="item.id">
           </el-option>
         </el-select>
       </div>
@@ -32,9 +34,9 @@
         <el-select v-model="selectOutpatientID" placeholder="请选择" style="width: 70%;">
           <el-option
             v-for="item in outpatientSelectData"
-            :key="item.outpatientID"
+            :key="item.id"
             :label="item.name"
-            :value="item.outpatientID">
+            :value="item.id">
           </el-option>
         </el-select>
       </div>
@@ -42,13 +44,13 @@
       <div class="info-in-box margin-right">
         <span class="title">日期：</span>
         <el-date-picker
-          v-model="dataOutCall"
+          v-model="dateOutCall"
           type="date"
           placeholder="选择日期">
         </el-date-picker>
       </div>
 
-      <el-button type="primary" style="width: 70px;height: 90%;" @click="getOutCallList">查询</el-button>
+      <el-button type="primary" style="width: 70px;height: 90%;" @click="getAllOutCallList()">查询</el-button>
     </div>
     <!--      表格位置-->
     <div class="button-table-box">
@@ -57,34 +59,36 @@
                    class="add-button" @click="dialogFormVisible = true">添加</el-button>
       </div>
       <table-list :tableAllData="tableAllData" @getTableData="getTableData" ref="tableList"></table-list>
+      <page-pagination :page-list="pageList" ref="pagePagination"></page-pagination>
     </div>
-    <!--      弹出框-->
-    <el-dialog title="添加" :visible.sync="dialogFormVisible" width="35%"  @close="cancelModal">
-      <el-form :model="ruleForm" ref="ruleForm" :rules="rules">
-        <el-form-item label="医生ID：" label-width="120px" prop="outCallName">
-          <span class="gray-text">{{ ruleForm.doctorID}}</span>
+    <!--     添加出诊计划弹出框-->
+    <el-dialog title="添加" :visible.sync="dialogFormVisible" width="35%"  @close="cancelModal"
+    v-loading="isLoading">
+      <el-form>
+        <el-form-item label="医生ID：" label-width="120px">
+          <span class="gray-text">{{ selectDoctorID}}</span>
         </el-form-item>
-        <el-form-item label="医生姓名：" label-width="120px" prop="outCallName">
+        <el-form-item label="医生姓名：" label-width="120px">
           <el-select v-model="selectDoctorID" placeholder="请选择" style="width: 70%;">
             <el-option
               v-for="item in doctorSelectData"
-              :key="item.doctorID"
-              :label="item.doctorName"
-              :value="item.doctorID">
+              :key="item.id"
+              :label="item.name"
+              :value="item.id">
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="诊室：" label-width="120px" prop="outCallName">
+        <el-form-item label="诊室：" label-width="120px">
           <el-select v-model="selectOutCallID" placeholder="请选择" style="width: 70%;">
             <el-option
               v-for="item in sentTableData.address"
-              :key="item.ID"
-              :label="item.name"
-              :value="item.ID">
+              :key="item.id"
+              :label="item.address"
+              :value="item.id">
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="时间段：" label-width="120px" prop="outCallName">
+        <el-form-item label="时间段：" label-width="120px">
           <el-select v-model="selectTimeID" placeholder="请选择" style="width: 70%;">
             <el-option
               v-for="item in sentTableData.time"
@@ -100,106 +104,103 @@
         <el-button type="primary" @click="addOutCall()">确 定</el-button>
       </div>
     </el-dialog>
+    <!--     修改出诊计划弹出框-->
+    <el-dialog title="修改" :visible.sync="updateDialog" width="35%"  @close="cancelModal"
+               v-loading="isLoading">
+      <el-form>
+        <el-form-item label="医生ID：" label-width="120px">
+          <span class="gray-text">{{ updateForm.doctorId}}</span>
+        </el-form-item>
+        <el-form-item label="医生姓名：" label-width="120px">
+          <span class="gray-text">{{ updateForm.doctorName}}</span>
+        </el-form-item>
+        <el-form-item label="诊室：" label-width="120px">
+          <el-select v-model="updateForm.clinicId" placeholder="请选择" style="width: 70%;">
+            <el-option
+              v-for="item in sentTableData.address"
+              :key="item.id"
+              :label="item.address"
+              :value="item.id">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="时间段：" label-width="120px">
+          <el-select v-model="updateForm.timeId" placeholder="请选择" style="width: 70%;">
+            <el-option
+              v-for="item in sentTableData.time"
+              :key="item.ID"
+              :label="item.name"
+              :value="item.ID">
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="cancelModal">取 消</el-button>
+        <el-button type="primary" @click="handleUpdate()">确 定</el-button>
+      </div>
+    </el-dialog>
+    <!--    用作删除的弹框-->
+    <delete-dialog :dialog="deleteDialog" ref="deleteDialog"></delete-dialog>
   </div>
 </template>
 
 <script>
+  import {getHospitalInfo} from "@/api/hospital";
+  import {getDoctorDepartmentList} from "@/api/departmentSetUp";
+  import {getOutpatientByHospital} from "@/api/outpatient";
+  import {tips} from "@/common/js/optionTips";
+  import {getAllOutCallList, addOutCall, updateOutCall, deleteOutCallById} from "@/api/outCall";
+  import {dateFormYMD} from "@/common/js/dateFormYMD";
+  import {getDoctorList} from "@/api/doctor";
+  import {getTreatRoom} from "@/api/treatRoom";
+  import {outCallTime, timeToNum} from "@/common/js/timeFilters";
+
   export default {
     name: "setUpDetail",
     data() {
       return {
         // 上面的下拉框的医院的数据
-        hospitalData: [{
-          hospitalID: '1001',
-          name: '大学城总院'
-        }, {
-          hospitalID: '1002',
-          name: '顺德分院'
-        }, {
-          hospitalID: '1003',
-          name: '越秀区分院'
-        }, {
-          hospitalID: '1004',
-          name: '白云区分院'
-        }],
-        selectHospitalID: '',
+        hospitalData: [],
+        selectHospitalID: 0,
         // 顶部的专科信息
-        departmentSelectData: [{
-          departmentID: '1001',
-          name: '儿科'
-        }, {
-          departmentID: '1002',
-          name: '内科'
-        }, {
-          departmentID: '1003',
-          name: '妇科'
-        }, {
-          departmentID: '1004',
-          name: '产科'
-        }],
-        selectDepartmentID: '',
+        departmentSelectData: [],
+        selectDepartmentID: 0,
         // 下拉框门诊数据
-        outpatientSelectData: [{
-          outpatientID: '1001',
-          name: '甲状腺',
-          disabled: false
-        }, {
-          outpatientID: '1002',
-          name: '内科门诊',
-          disabled: false
-        }, {
-          outpatientID: '1003',
-          name: '甲亢专科',
-          disabled: false
-        }, {
-          outpatientID: '1004',
-          name: '内分泌',
-          disabled: false
-        }],
-        selectOutpatientID: '',
+        outpatientSelectData: [],
+        selectOutpatientID: 0,
         // 顶部下拉框的日期的数据
-        dataOutCall: '',
+        dateOutCall: new Date(),
         // 表格数据
         tableAllData: {
+          dataNull: false,
           tableTitle: [{
             prop: 'ID',
             label: '编号',
             width: '70',
             option: ''
           }, {
-            prop: 'doctorID',
+            prop: 'doctorId',
             label: '医生ID',
             width: '110',
             option: ''
           }, {
-            prop: 'name',
-            label: '姓名',
+            prop: 'doctorName',
+            label: '医生姓名',
             width: '120',
             option: ''
           }, {
             prop: 'address',
             label: '诊室',
             width: '250',
-            option: 'select'
+            option: ''
           }, {
             prop: 'time',
            label: '时间段',
            width: '200',
-           option: 'select'
+           option: ''
       }],
-          tableData: [{
-            ID: '1',
-            doctorID: '1001',
-            name: '杨XX',
-            address: '内科二楼7诊室',
-            time: '08：30~09：00'
-          }, {
-            ID: '2',
-            doctorID: '1002',
-            name: '杨XX',
-            address: '内科二楼8诊室',
-            time: '08：30~09：00'
-          }],
+          tableData: [],
           option: {
             width: '250',
             button: [{
@@ -215,98 +216,227 @@
         },
         // 时间段的下拉框
         sentTableData: {
-          address: [{
-            ID: '1001',
-            name: '内科二楼7诊室'
-          }, {
-            ID: '1002',
-            name: '内科二楼8诊室'
-          }],
+          address: [],
           time: [{
-            ID: '1',
-            name: '08：30~09：00'
+            ID: 1,
+            name: '08：30~12：00'
           }, {
-            ID: '2',
-            name: '09：00~09：30'
+            ID: 2,
+            name: '14：00~18：00'
           }]
         },
-        // 模态框的
+        // 添加模态框的
         dialogFormVisible: false,
-        ruleForm: {
-          doctorID: '',
-          doctorName: '',
-          address: '',
-          time: ''
-        },
-        doctorSelectData: [{
-          doctorID: '1001',
-          doctorName: '杨XX'
-        },{
-          doctorID: '1002',
-          doctorName: '杨XX'
-        }],
+        doctorSelectData: [], // 添加出诊计划时的医生信息列表
         selectDoctorID: '',
-        selectOutCallID: '',
-        selectTimeID: ''
+        selectOutCallID: '', // 选择的诊室的id
+        selectTimeID: 1,  // 选择的时间的id
+        // 底部分页的数据
+        pageList: {
+          pageNum: 1,
+          pageSize: 5,
+          total: 0
+        },
+        // 删除的模态框的数据
+        deleteDialog: {
+          title: '出诊计划',
+          dialogFormVisible: false,
+          id: ''
+        },
+        deleteScope: {}, // 用作当从组件传过来确认删除时用的
+        isLoading: false,
+        // 修改模态框的
+        updateDialog: false,
+        updateForm: {}
       }
     },
     methods: {
-      // 点击确认选择医院和专科门诊等
-      getOutCallList: function () {
-        // 发起切换医院和专科的请求
-      },
       getTableData: function(option){
         if (option.buttonName === '编辑') {
-          this.editOutCall(option.scopeRow)
+          this.updateForm = option.scopeRow;
+          this.updateDialog = true;
         } else if (option.buttonName === '删除') {
-          this.deleteOutpatient(option)
-        } else if (option.buttonName == '修改') {
-          this.handleUpdate(option.scopeRow)
+          this.deleteScope = option; // 将删除的数据存起来
+          this.deleteDialog.dialogFormVisible = true; // 打开删除弹窗
+          this.deleteDialog.id = option.scopeRow.ID; // 发送删除id
         }
       },
-      // 点击了编辑操作
-      editOutCall: function(scope) {
-        this.$refs.tableList.editSelect(this.sentTableData, scope)
-      },
       // 删除列表中的某一条数据
-      deleteOutpatient: function(scope) {
-        this.$refs.tableList.deleteData(scope.scopeIndex)
+      deleteData: function() {
+        deleteOutCallById(this.deleteScope.scopeRow.ID).then(res => {
+          if (res.code === 200) {
+            this.deleteDialog.dialogFormVisible = false;
+            this.$refs.tableList.deleteData(this.deleteScope.scopeIndex)
+          }
+        }).catch(() => {
+          tips('error', '删除失败')
+        });
       },
       // 点击了修改按钮
-      handleUpdate: function (row) {
-        console.log(row)
-        this.$refs.tableList.handleUpdate()
+      handleUpdate: function () {
+        const data = this.updateForm;
+        this.isLoading = true;
+        updateOutCall(data.ID, {
+          clinicId: data.clinicId,
+          day: this.dateOutCall,
+          doctorId: data.doctorId,
+          hospitalId: this.selectHospitalID,
+          outpatientId: this.selectOutpatientID,
+          specialId: this.selectDepartmentID,
+          time: data.time
+        }).then(res => {
+          if (res.code === 200) {
+            this.getAllOutCallList();
+            this.updateDialog = false;
+          }
+          this.isLoading = false;
+        }).catch(() => {
+          this.isLoading = false;
+          tips('error', '更新出诊计划失败')
+        })
+        // this.$refs.tableList.handleUpdate()
       },
       // 点击添加诊室
       addOutCall: function () {
-        this.$refs['ruleForm'].validate((valid) => {
-          if (valid) {
-            this.tableAllData.tableData.push({
-              ID: '3',
-              outCallID: '1003',
-              address: '内科儿科9诊室'
-            })
-            this.ruleForm.outCallName = ''
-          } else {
-            return false;
+        this.isLoading = true;
+        addOutCall({
+          clinicId: this.selectOutCallID,
+          day: this.dateOutCall,
+          doctorId: this.selectDoctorID,
+          hospitalId: this.selectHospitalID,
+          outpatientId: this.selectOutpatientID,
+          specialId: this.selectDepartmentID,
+          time: this.selectTimeID
+        }).then(res => {
+          if (res.code === 200) {
+            this.isLoading = false;
+            this.getAllOutCallList();
+            tips('success', '添加成功')
           }
+        }).catch(() => {
+          this.isLoading = false;
+          tips('error', '添加失败')
         })
-
       },
       // 关闭模态框
       cancelModal: function () {
-        this.dialogFormVisible = false
-        this.ruleForm.outCallName = ''
-        this.$nextTick(() => {
-          this.$refs['ruleForm'].clearValidate()
+        this.dialogFormVisible = false;
+        this.deleteDialog.dialogFormVisible = false;
+        this.updateDialog = false;
+        this.selectDoctorID = '';
+      },
+      // 获取所有医院
+      getHospitalInfo: function () {
+        this.hospitalData = [];
+        getHospitalInfo(1, 50, '').then(res => {
+          if (res.code === 200 && res.data.list.length >0 ){
+            this.hospitalData = res.data.list;
+            this.selectHospitalID = res.data.list[0].id;
+            this.getHospitalDepartmentList()
+          }
+        }).catch(() => {
+          tips('error', '获取医院信息失败');
         })
       },
+      // 获取医院的专科列表
+      getHospitalDepartmentList: function() {
+        this.departmentSelectData = [];
+        getDoctorDepartmentList(this.selectHospitalID, 1, 50)
+          .then(res => {
+            if (res.code === 200) {
+              if (res.data.list !== null) {
+                this.departmentSelectData = res.data.list;
+                this.selectDepartmentID = res.data.list[0].id;
+                this.getOutpatientByHospital()
+              }
+            }
+          }).catch(() => {
+          tips('error', '获取专科列表失败')
+        })
+      },
+      // 获取门诊列表
+      getOutpatientByHospital: function() {
+        this.outpatientSelectData = [];
+        getOutpatientByHospital(this.selectHospitalID, this.selectDepartmentID, 1, 50).then(res => {
+          if (res.code === 200) {
+            const data = res.data.list;
+            if (res.data.list.length > 0) {
+              this.outpatientSelectData = data;
+              this.selectOutpatientID = data[0].id;
+              this.getAllOutCallList()
+            }
+          }
+        }).catch(() => {
+          tips('error', '获取门诊信息失败')
+        })
+      },
+      // 获取列表数据，医生排版的数据
+      getAllOutCallList: function() {
+        this.tableAllData.tableData = [];
+        getAllOutCallList(dateFormYMD(this.dateOutCall), this.pageList.pageNum, this.pageList.pageSize,
+          this.selectHospitalID, this.selectDepartmentID, this.selectOutpatientID).then(res => {
+            if (res.code === 200) {
+              const data = res.data.list;
+              let that = this;
+              if (data.length > 0) {
+                data.forEach(function (item, index) {
+                  that.tableAllData.tableData.push({
+                    ID: item.id,
+                    doctorId: item.doctorId,
+                    doctorName: item.doctorName,
+                    address: item.clinicName,
+                    clinicId: item.clinicId, // 用于修改的时候的诊室的id
+                    time: outCallTime(item.time),
+                    timeId: item.time
+                  })
+                });
+                // this.selectDoctorID = '';
+              } else {
+                this.tableAllData.dataNull = true
+              }
+              this.getDoctorList()
+            }
+        }).catch(() => {
+          tips('error', '获取出诊列表失败')
+        })
+      },
+      // 获取该专科门诊的医生
+      getDoctorList: function() {
+        this.doctorSelectData = [];
+        getDoctorList(this.selectDepartmentID, this.selectOutpatientID, 1,100, '').then(res => {
+          if (res.code === 200) {
+            if (res.data.list.length > 0) {
+              this.doctorSelectData = res.data.list;
+              // this.selectDoctorID = this.doctorSelectData[0].id
+              this.getTreatRoom()
+            }
+          }
+        }).catch(() => {
+          tips('error', '获取所属医生列表失败')
+        })
+      },
+      // 获取门诊的诊室信息
+      getTreatRoom: function() {
+        this.sentTableData.address = [];
+        getTreatRoom(this.selectOutpatientID, 1, 100).then(res => {
+          if (res.code === 200) {
+            this.sentTableData.address = res.data.list;
+            // this.selectOutCallID = this.sentTableData.address[0].id
+          }
+        }).catch(() => {
+          tips('error', '获取诊室信息失败')
+        })
+      },
+      // 子组件分页通过调用父组件的方法进行调用更新表格
+      fatherMethod: function (pageNum, pageSize) {
+        this.pageList.pageNum = pageNum;
+        this.pageList.pageSize = pageSize;
+        this.getAllOutCallList()
+      }
 
     },
     mounted() {
-      this.selectHospitalID = this.$route.query.hospitalID
-      this.selectDepartmentID = this.$route.query.departmentID
-      this.selectOutpatientID = this.$route.query.outpatientID
+      this.getHospitalInfo()
     }
   }
 </script>

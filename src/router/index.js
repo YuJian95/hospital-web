@@ -297,7 +297,8 @@ export const systemRouterMap = [
       component: () => import('@/view/setUpManagement/setUpDetail'),
       meta: {title: '排版详情', icon: 'el-icon-user'}
     }]
-  }, {
+  },
+  /*{
     path: '/',
     component: layout,
     redirect: '/userPermission',
@@ -335,7 +336,7 @@ export const systemRouterMap = [
       meta: {title: '二级菜单', icon: 'el-icon-user'},
       hidden: true
     }]
-  },
+  },*/
   {path: '*', redirect: '/404', hidden: true}
 ];
 export default new VueRouter({

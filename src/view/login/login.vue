@@ -55,6 +55,8 @@
         _this.$refs.ruleForm2.validate((valid) => {
           if (valid) {
             _this.loading = true;
+
+            // 实现登录
               this.$store.dispatch('Login', this.ruleForm2).then(() => {
               if (this.checked) {
                 setCookie("username",this.ruleForm2.username,15);

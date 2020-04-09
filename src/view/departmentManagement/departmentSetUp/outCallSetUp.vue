@@ -198,7 +198,7 @@
       },
       // 点击添加诊室
       addOutCall: function () {
-        this.$refs['ruleForm'].validate((valid) => {
+        this.$refs['ruleForm'].dateForm((valid) => {
           if (valid) {
             this.tableAllData.tableData.push({
               ID: '3',

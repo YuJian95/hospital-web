@@ -35,7 +35,7 @@
               <el-select v-model="scope.row[item.prop]" placeholder="请选择"
                          style="width: 90%;" @change="selectDataFun(item.prop)">
                 <el-option
-                  v-for="item2 in selectData[item.prop]"
+                  v-for="item2 in selectData"
                   :key="item2.ID"
                   :label="item2.name"
                   :value="item2.ID">
@@ -185,7 +185,7 @@
        * 点击了的是编辑是下拉框的
        * **/
       editSelect: function (data,row) {
-        this.editIndex(row)
+        this.editIndex(row);
         this.selectData = data
       },
       // 医生点击了某个患者的就诊按钮

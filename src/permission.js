@@ -16,6 +16,10 @@ export function getPermission() {
 
       router.addRoutes(array)
     });
+  } else {
+    let array = constantRouterMap.concat(doctorRouterMap);
+    router.options.routes = array;
+    router.addRoutes(array)
   }
   // let a = {
   //   path: '/',
