@@ -168,7 +168,7 @@
         },
         // 确认添加到表格里
         addDepartment: function (formName) {
-          this.$refs[formName].dateForm((valid) => {
+          this.$refs[formName].validate((valid) => {
             if (valid) {
               this.isLoading = true;
               addDepartment({

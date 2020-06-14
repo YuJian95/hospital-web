@@ -8,7 +8,7 @@ import store from '@/store';
 console.log(process.env.VUE_APP_BASE_API)
 const service = axios.create({
   baseURL: 'http://localhost:8080/hospital',
-  timeout: 5000  // 请求超过5秒就报错
+  timeout: 15000  // 请求超过15秒就报错
 })
 
 // request拦截器

@@ -189,9 +189,10 @@ export let constantRouterMap = [{
        component: () => import('@/view/patientManagement/appointDetail/appointDetail'),
        meta: {title: '预约详情', icon: 'el-icon-user'}
      }, {
-       path: '/treatHistorySelect',
-       component: () => import('@/view/patientManagement/treatHistorySelect/treatHistorySelect'),
-       meta: {title: '就诊查询', icon: 'el-icon-user'}
+       path: '/patientMedicalRecord',
+       component: () => import('@/view/patientManagement/appointDetail/patientMedicalRecord'),
+       meta: {title: '患者详情', icon: 'el-icon-user'},
+       hidden: true
      }]
    }, {
      path: '/',

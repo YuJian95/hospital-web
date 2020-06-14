@@ -1,7 +1,7 @@
 <template>
     <div>
       <!--      表格位置-->
-      <div class="button-table-box">
+      <div class="button-table-box" v-loading="isLoading">
         <div class="info-in-box">
           <span class="title">姓名：</span>
           <el-input placeholder="输入医生姓名" v-model="searchDoctor" style="width: 15%"></el-input>
@@ -43,12 +43,16 @@
   import {getDepartmentList} from "@/api/department";
   import {getOutpatientListById} from "@/api/outpatient";
   import {tips} from "@/common/js/optionTips";
+  import {createDoctorManager} from "@/api/doctor";
+  import SHA256 from 'js-sha256';
+
 
   export default {
         name: "doctorDetail",
       data() {
           return {
             // 顶部筛选信息
+            isLoading: false,
             searchDoctor: '',
             selectDepartmentData:[],
             selectDepartmentID: 0,
@@ -88,6 +92,10 @@
                 width: '250',
                 button: [{
                   size: 'mini',
+                  type: 'primary',
+                  name: '创建账号'
+                }, {
+                  size: 'mini',
                   type: 'success',
                   name: '编辑'
                 }, {
@@ -125,6 +133,20 @@
             sessionStorage.setItem('doctorInfo', JSON.stringify(option.scopeRow));
             this.$router.push({
               path: '/editDoctor'
+            })
+          } else if (option.buttonName === '创建账号') {
+            this.isLoading = true;
+            createDoctorManager({
+              name: option.scopeRow.ID,
+              password: SHA256('123456')
+            }).then(res => {
+              if (res.code === 200) {
+                this.isLoading = false;
+                tips('success', '创建账号成功')
+              }
+            }).catch(() => {
+              this.isLoading = false;
+              tips('error', '账号已存在')
             })
           }
         },

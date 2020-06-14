@@ -69,8 +69,27 @@
                 :key = "item.name"
                 :size="item.size"
                 :type="item.type"
+                v-if="item.name !== '就诊'"
                 @click="emitIndex(scope.$index, scope.row, item.name)">{{item.name}}</el-button>
+              <el-button
+                v-for="(item,index) in tableAllData.option.button"
+                :key = "item.name"
+                :size="item.size"
+                :type="item.type"
+                v-if="item.name === '就诊' && scope.row.btnStatus === 0"
+                @click="emitIndex(scope.$index, scope.row, item.name)">{{item.name}}</el-button>
+              <el-button
+                size="mini"
+                type="warning"
+                v-if="scope.row.btnStatus === 3"
+                @click="emitIndex(scope.$index, scope.row, '重新叫号')">重新叫号</el-button>
+              <el-button
+                size="mini"
+                type="primary"
+                v-if="scope.row.btnStatus === 3 || scope.row.btnStatus === 1"
+                @click="emitIndex(scope.$index, scope.row, '查看')">查看</el-button>
             </div>
+
             <div v-show="isEdit && edit === scope.row.ID">
               <el-button
                 size="mini"
@@ -82,11 +101,8 @@
                 type="success"
                 @click="emitIndex(scope.$index, scope.row, '修改')">修改</el-button>
             </div>
-            <div v-show="isClickTreat && edit === scope.row.ID">
-              <el-button
-                size="mini"
-                type="warning"
-                @click="emitIndex(scope.$index, scope.row, '重新叫号')">重新叫号</el-button>
+            <div >
+
             </div>
           </template>
         </el-table-column>
@@ -113,7 +129,6 @@
         saveEdit: {},// 作为编辑时的中间保留值
         showEdit: {},
         selectData: {},
-        isClickTreat: false, // 只有医生页面的点击就诊才会出现
         // loading: true // 用于表格的加载中
       }
     },
@@ -161,6 +176,7 @@
         this.edit = row.ID;
         this.isEdit = true
       },
+
       // 点击了编辑之后的取消按钮
       cancelEdit: function () {
         this.isEdit = false;
@@ -188,11 +204,6 @@
         this.editIndex(row);
         this.selectData = data
       },
-      // 医生点击了某个患者的就诊按钮
-      clickTreat: function (ID) {
-        this.edit = ID;
-        this.isClickTreat = true
-      }
     },
     computed: {
       loading: function () {

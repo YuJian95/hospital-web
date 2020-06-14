@@ -14,7 +14,8 @@
       <table-list :tableAllData="tableAllData" @getTableData="getTableData" ref="tableList"></table-list>
     </div>
     <!--      弹出框-->
-    <el-dialog title="添加诊室" :visible.sync="dialogFormVisible" width="35%"  @close="cancelModal">
+    <el-dialog title="添加诊室" :visible.sync="dialogFormVisible" width="35%"  @close="cancelModal"
+    v-loading="isLoading">
       <el-form :model="ruleForm" ref="ruleForm" :rules="rules">
         <el-form-item label="诊室地址：" label-width="120px" prop="outCallName">
           <el-input v-model="ruleForm.outCallName" style="width: 90%;" autofocus></el-input>
@@ -38,6 +39,7 @@
         name: "outCallDetail",
       data() {
           return {
+            isLoading: false,
             outpatientId: '',
             outpatientName: '',
             // 表格数据
@@ -167,6 +169,7 @@
         addOutCall: function () {
           this.$refs['ruleForm'].validate((valid) => {
             if (valid) {
+              this.isLoading = true;
               addTreatRoom({
                 address: this.ruleForm.outCallName,
                 outpatientId: this.outpatientId
@@ -178,9 +181,11 @@
                     type: 'success'
                   });
                   this.ruleForm.outCallName = '';
-                  this.getTreatRoomList()
+                  this.getTreatRoomList();
+                  this.isLoading = false;
                 }
               }).catch(() => {
+                this.isLoading = false;
                 tips('error', '添加诊室失败')
               });
             } else {

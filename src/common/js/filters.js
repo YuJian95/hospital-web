@@ -46,11 +46,20 @@ const filters = {
       return '男'
     }
     return '女'
+  },
+
+  // 获取就诊时间
+  getTreatTimeNoon(num) {
+    if (num === 1) {
+      return '08:30~12:00'
+    } else {
+      return '14:00~18:00'
+    }
   }
 };
 
 // 将获取到的时间假如不是两位数的话在前面加0
-function turnDouble(num) {
+ function turnDouble(num) {
   // 假如长度为2
   if (num >= 10) {
     return num

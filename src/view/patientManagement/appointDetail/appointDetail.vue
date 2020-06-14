@@ -25,20 +25,26 @@
           </el-select>
         </div>
 
-        <el-button type="primary" style="width: 70px;height: 90%;">查询</el-button>
+        <el-button type="primary" style="width: 70px;height: 90%;" @click="getPatientList">查询</el-button>
       </div>
       <!--      表格位置-->
       <div class="button-table-box">
-        <span class="treat-room-text">诊室：内科二楼7诊室</span>
+        <span class="treat-room-text"></span>
         <table-list :tableAllData="tableAllData" @getTableData="getTableData" ref="tableList"></table-list>
+        <page-pagination :page-list="pageList" ref="pagePagination"></page-pagination>
       </div>
     </div>
 </template>
 
 <script>
-  import { login } from '@/api/login.js'
-  import axios from 'axios'
-    export default {
+  import {getPatientList} from "@/api/doctor";
+  import {dateFormYMD} from "@/common/js/dateFormYMD";
+  import {tips} from "@/common/js/optionTips";
+  import {getGender, getTimePeriod} from "@/common/js/timeFilters";
+  import {getCookie} from "@/utils/cookies";
+  import {updateTreatStatusFinish, updateStatusAgain} from "@/api/patient";
+
+  export default {
         name: "show1",
       data() {
           return {
@@ -53,6 +59,7 @@
             selectTimeID: 1,
             // 表格数据
             tableAllData: {
+              dataNull: false,
               tableTitle: [{
                 prop: 'ID',
                 label: '编号',
@@ -84,38 +91,33 @@
                 width: '150',
                 option: 'input'
               }],
-              tableData: [{
-                ID: '1',
-                queueID: 1,
-                treatCardID: '1001',
-                name: 'yang',
-                gender: 1,
-                appointTime: 1
-              }, {
-                ID: '2',
-                queueID: 2,
-                treatCardID: '1002',
-                name: 'yue',
-                gender: 2,
-                appointTime: 2
-              }],
+              tableData: [],
               option: {
-                width: '300',
-                button: [{
-                  size: 'mini',
-                  type: 'primary',
-                  name: '查看'
-                }]
+                width: '350',
+                button: [
+                //   {
+                //   size: 'mini',
+                //   type: 'primary',
+                //   name: '查看'
+                // }
+                ]
               }
             },
             isTimeTreat: false,
-            isClickTreat: false
+            isClickTreat: false,
+            // 底部分页的数据
+            pageList: {
+              pageNum: 1,
+              pageSize: 5,
+              total: 0
+            },
+            statusData: []
           }
       },
       created() {
-          this.getCurrentTime()
-        this.addTableButton()
-        this.testAPI()
+          this.getCurrentTime();
+        this.addTableButton();
+        this.getPatientList();
       },
       methods: {
           // 获取从表格中获取的按钮的事件
@@ -123,10 +125,24 @@
           if (option.buttonName === '查看') {
             this.getPatientDetailByID(option.scopeRow)
           } else if (option.buttonName === '就诊') {
-            // this.toPatientTreat(option.scopeRow)
-            this.$refs.tableList.clickTreat(option.scopeRow.ID)
-          } else if (option.buttonName == '修改') {
-            this.handleUpdate(option.scopeRow)
+            // 修改患者状态
+            updateTreatStatusFinish(option.scopeRow.ID).then(res => {
+              if (res.code === 200) {
+                this.getPatientList()
+              }
+            }).catch(() => {
+              tips('error', '网络错误')
+            })
+          } else if (option.buttonName === '重新叫号') {
+            // 修改患者状态
+            updateStatusAgain(option.scopeRow.ID).then(res => {
+              if (res.code === 200) {
+                tips('success', '已重新叫号');
+                this.getPatientList()
+              }
+            }).catch(() => {
+              tips('error', '重新叫号失败')
+            })
           }
         },
           // 获取当天时间
@@ -143,13 +159,14 @@
           let afternoonStart = new Date(year, month, date, 14);
           let afternoonEnd = new Date(year, month, date, 18, 30);
           if (today > morningStart && today < morningEnd) {
-            this.selectTimeID = 1
+            this.selectTimeID = 1;
             this.isTimeTreat = true
           } else if (today > afternoonStart && today < afternoonEnd) {
-            this.selectTimeID = 2
+            this.selectTimeID = 2;
             this.isTimeTreat = true
           } else {
-            this.selectTimeID = ''
+            this.selectTimeID = 2;
+            this.isTimeTreat = true
           }
         },
         // 到达医生出诊时间动态的添加就诊按钮和重新叫号按钮
@@ -161,33 +178,70 @@
               name: '就诊'
             }
             this.tableAllData.option.button.push(treatButton)
-            if (this.isClickTreat) {
-              const treatAgainButton = {
-                size: 'mini',
-                type: 'warning',
-                name: '重新叫号'
-              }
-              this.tableAllData.option.button.push(treatAgainButton)
-            }
+            // if (this.isClickTreat) {
+            //   const treatAgainButton = {
+            //     size: 'mini',
+            //     type: 'warning',
+            //     name: '重新叫号'
+            //   }
+            //   this.tableAllData.option.button.push(treatAgainButton)
+            // }
           }
         },
         // 用户点击了查看按钮
         getPatientDetailByID: function (scope) {
+          console.log(scope.ID)
           this.$router.push({
             path: '/patientMedicalRecord',
-            query: { ID: scope.treatCardID }
+            query: {
+              ID: scope.treatCardID ,
+              appointId: scope.ID
+            }
           });
         },
-        // 测试接口
-        testAPI: function () {
-          let userName = 'admin'
-          let password = 'admin'
-          axios.get('/hospital/power/account/login/' + userName + '/' + password).then(res => {
-            console.log(res)
+        // 获取患者挂号列表
+        getPatientList: function () {
+          this.statusData = [];
+          this.tableAllData.tableData = [];
+          let date = dateFormYMD(this.appointDate);
+          getPatientList(getCookie('username'), date, this.selectTimeID,
+            this.pageList.pageNum, this.pageList.pageSize).then(res => {
+              if (res.code === 200) {
+                let data = res.data.list
+                if (data === null) {
+                  this.tableAllData.dataNull = true;
+                } else {
+                  if (data.length !== 0) {
+                    let that = this;
+                    data.forEach(function (item, index) {
+                      that.tableAllData.tableData.push({
+                        btnStatus: item.status,
+                        ID: item.appointmentId,
+                        queueID: item.queueNum,
+                        treatCardID: item.cardId,
+                        name: item.name,
+                        gender: getGender(item.gender),
+                        appointTime: getTimePeriod(item.timePeriod)
+                      })
+                    });
+                    console.log(this.tableAllData.tableData)
+
+                    this.tableAllData.dataNull = false;
+                  } else {
+                    this.tableAllData.dataNull = true;
+                  }
+                }
+              }
+          }).catch(() => {
+            tips('error', '获取患者列表失败 ');
+            this.tableAllData.dataNull = true;
           })
-          // login(userName,password).then(res => {
-          //   console.log(res)
-          // })
+        },
+        // 子组件分页通过调用父组件的方法进行调用更新表格
+        fatherMethod: function (pageNum, pageSize) {
+          this.pageList.pageNum = pageNum;
+          this.pageList.pageSize = pageSize;
+          this.getPatientList()
         }
         }
     }

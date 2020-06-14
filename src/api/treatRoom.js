@@ -30,10 +30,17 @@ export function updateTreatRoom(treatRoomId, data) {
     data
   })
 }
-//
+// 4、删除诊室
 export function deleteTreatRoom(treatRoomId) {
   return request({
     url: '/hospital/clinic/' + treatRoomId,
     method: 'delete'
+  })
+}
+// 5、通过诊室id获取诊室信息
+export function getTreatRoomById(id) {
+  return request({
+    url: '/hospital/clinic/' + id,
+    method: 'get'
   })
 }
