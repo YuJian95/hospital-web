@@ -22,6 +22,15 @@ elementUI进行设计的；同时使用webpack代理表进行跨域处理；所�
 4. 接着运行前端代码npm run dev；
 5. 目前只有账号admin 密码admin；
 
+### npm install 报错，Error: Can't find Python executable "python", you can set the PYTHON env variable.
+
+**解决方案：**
+
+```npm
+npm config set sass_binary_site https://npm.taobao.org/mirrors/node-sass/
+npm install node-sass
+```
+
 ## 使用说明
 1. 首先每个账号及密码都是系统管理员赋予的，不能自行进行创建；
 2. 医生管理员通过输入自己的指定账号和初始化密码进行，只能看到自己的患者和出诊情况，同时可以
