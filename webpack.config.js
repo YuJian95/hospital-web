@@ -1,13 +1,14 @@
 var path = require('path')
 var webpack = require('webpack')
-// var htmlWebpackPlugin = require('html-webpack-plugin')
+var htmlWebpackPlugin = require('html-webpack-plugin')
 module.exports = {
   entry: './src/main.js',
   output: {
-    path: path.resolve(__dirname, './dist'),
-    publicPath: '/dist/',
-    filename: 'build.js'
+    filename: '[name].js',
+    path: __dirname + '/dist',
+    chunkFilename: '[id].[chunkhash].js'
   },
+
   module: {
     rules: [
       {
@@ -55,11 +56,11 @@ module.exports = {
           // other vue-loader options go here
         }
       },
-     /* {
-        test: /\.js$/,
-        loader: 'babel-loader',
-        exclude: /node_modules/
-      },*/
+      /* {
+         test: /\.js$/,
+         loader: 'babel-loader',
+         exclude: /node_modules/
+       },*/
 
       {
         test: /\.js$/,
@@ -75,16 +76,15 @@ module.exports = {
           name: '[name].[ext]?[hash]'
         }
       },
-      { test: /\.(eot|woff|ttf)$/, loader: 'file-loader' }
+      {test: /\.(eot|woff|ttf)$/, loader: 'file-loader'}
     ]
   },
-  /*  plugins: [
-      new htmlWebpackPlugin({
-        template: '@/layout/layout.vue',
-        favicon: 'favicon.ico',
-        inject: true
-      })
-    ],*/
+  plugins: [
+    new htmlWebpackPlugin({
+      template: './public/index.html',
+      inject: true
+    })
+  ],
   resolve: {
     alias: {
       'vue$': 'vue/dist/vue.esm.js',
@@ -98,11 +98,11 @@ module.exports = {
     // overlay: true,
     hot: true,
     inline: true,
-    stats: { colors: true },
+    stats: {colors: true},
     proxy: {
       '/hospital': {
         target: 'http://localhost:8080',
-        pathRewrite: { ['^' + process.env.VUE_APP_BASE_API]: '/' },
+        pathRewrite: {['^' + process.env.VUE_APP_BASE_API]: '/'},
         changeOrigin: true
       }
     }
