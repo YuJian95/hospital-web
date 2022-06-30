@@ -1,14 +1,16 @@
 var path = require('path')
 var webpack = require('webpack')
-var htmlWebpackPlugin = require('html-webpack-plugin')
+var HtmlWebpackPlugin = require('html-webpack-plugin')
+var {CleanWebpackPlugin} = require('clean-webpack-plugin')
 module.exports = {
-  entry: './src/main.js',
-  output: {
-    filename: '[name].js',
-    path: __dirname + '/dist',
-    chunkFilename: '[id].[chunkhash].js'
+  entry: {
+    app: './src/main.js'
   },
-
+  output: {
+    path: __dirname + '/dist',
+    filename: 'js/[name].js',
+    // chunkFilename: '[id].[chunkhash].js'
+  },
   module: {
     rules: [
       {
@@ -70,18 +72,27 @@ module.exports = {
         }
       },
       {
-        test: /\.(png|jpg|gif|svg)$/,
+        test: /\.(png|jpg|gif|jpeg|svg)$/,
         loader: 'file-loader',
         options: {
-          name: '[name].[ext]?[hash]'
+          limit: 10000,
+          name: 'img/[name]-[hash:6].[ext]'
         }
       },
-      {test: /\.(eot|woff|ttf)$/, loader: 'file-loader'}
+      {
+        test: /\.(eot|woff|ttf)$/,
+        loader: 'file-loader',
+        options: {
+          name: 'fonts/[name]-[hash:6].[ext]'
+        }
+      }
     ]
   },
   plugins: [
-    new htmlWebpackPlugin({
-      template: './public/index.html',
+    new CleanWebpackPlugin(),
+    new HtmlWebpackPlugin({
+      template: 'index.html',
+      filename: 'index.html',
       inject: true
     })
   ],
