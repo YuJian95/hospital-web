@@ -35,7 +35,8 @@
         </div>
         <div class="info-in-box">
           <span class="title">所属专科：</span>
-          <el-select v-model="doctorData.specialId" placeholder="请选择">
+          <el-select v-model="doctorData.specialId" placeholder="请选择"
+                     @change="getOutpatientByDepartmentID">
             <el-option
               v-for="item in departmentSelectData"
               :key="item.id"
@@ -77,6 +78,7 @@
 
 <script>
   import {addDoctor, updateDoctor} from "@/api/doctor";
+  import {getOutpatientListById} from "@/api/outpatient";
   import {tips} from "@/common/js/optionTips";
 
   export default {
@@ -184,7 +186,18 @@
           this.loading = false;
           tips('error', '修改失败')
         })
-      }
+      },
+      // 获取专科的门诊信息
+      getOutpatientByDepartmentID: function () {
+        getOutpatientListById(1, 50, this.doctorData.specialId).then(res => {
+          if (res.code === 200 && res.data.list.length > 0) {
+            this.outpatientSelectData = res.data.list;
+            this.doctorData.outpatientId = this.outpatientSelectData[0].id;
+          }
+        }).catch(() => {
+          tips('error', '获取门诊信息失败，请检查网络');
+        })
+      },
     },
     created() {
       this.departmentSelectData = JSON.parse(sessionStorage.getItem('departmentList'));
